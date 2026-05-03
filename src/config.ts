@@ -5,7 +5,7 @@ export const APP_CONFIG = {
   // Identity
   appName: 'My App',
   appSlug: 'my-app',                        // matches app.json slug
-  apiAppId: 'brain-dump',                   // must match a registeredApp in cathartic-api config.ts
+  apiAppId: 'my-app',                        // ← SET THIS FIRST — must match a registeredApp in cathartic-api/src/config.ts
   bundleId: 'com.studiocatharsis.myapp',    // iOS bundle ID / Android package
   supportEmail: 'support@studiocatharsis.com',
   logoIcon: 'pulse-outline',                // any valid Ionicons name

@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { onAuthStateChanged } from 'firebase/auth';
+import { firebaseAuth } from '@/services/firebaseClient';
+import { setTokenGetter, clearTokenGetter } from '@/functions/api';
 import { authFunctions } from '@/functions/auth';
 
 export interface User {
@@ -28,10 +31,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    AsyncStorage.getItem(USER_KEY).then((stored) => {
-      if (stored) setUser(JSON.parse(stored));
+    // Sync with Firebase Auth state — restores session after app restart
+    const unsub = onAuthStateChanged(firebaseAuth, async (fbUser) => {
+      if (fbUser) {
+        setTokenGetter(() => fbUser.getIdToken());
+        const stored = await AsyncStorage.getItem(USER_KEY);
+        if (stored) setUser(JSON.parse(stored));
+      } else {
+        clearTokenGetter();
+        await AsyncStorage.removeItem(USER_KEY);
+        setUser(null);
+      }
       setIsLoading(false);
     });
+    return unsub;
   }, []);
 
   const persist = async (u: User | null) => {

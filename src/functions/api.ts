@@ -1,18 +1,25 @@
-// Central API client. Configure BASE_URL and any auth headers here.
-// All screens and hooks call this — never call fetch/axios directly.
+import { APP_CONFIG } from '@/config';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://api.example.com';
 
+// Set by AuthContext after sign-in so every request auto-includes a fresh token
+let _getToken: () => Promise<string | null> = async () => null;
+export const setTokenGetter = (fn: () => Promise<string | null>) => { _getToken = fn; };
+export const clearTokenGetter = () => { _getToken = async () => null; };
+
 interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: object;
-  token?: string;
+  skipAuth?: boolean;
 }
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { body, token, ...rest } = options;
+  const { body, skipAuth, ...rest } = options;
+
+  const token = skipAuth ? null : await _getToken();
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    'X-App-Id': APP_CONFIG.apiAppId,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(rest.headers as Record<string, string>),
   };

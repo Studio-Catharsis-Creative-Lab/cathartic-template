@@ -58,7 +58,7 @@ export function GlassInput({
           <Ionicons
             name={icon}
             size={20}
-            color={focused ? theme.colors.primary : theme.colors.textMuted}
+            color={focused ? theme.colors.primary : theme.colors.textOnSurface}
             style={styles.leftIcon}
           />
         )}
@@ -84,7 +84,7 @@ export function GlassInput({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 12,
+    marginBottom: 0,
   },
   label: {
     fontSize: 12,

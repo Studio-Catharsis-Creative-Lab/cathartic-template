@@ -1,35 +1,39 @@
-// Default / blank screen template.
-// Duplicate this file and rename it for each new feature screen.
-// Remove the placeholder content and build your feature here.
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/context/ThemeContext';
-import { ThemeBackground, AppLogo, StreakBadge, GlassCard, GlassButton } from '@/components';
+import { ThemeBackground, AppLogo, StreakBadge, GlassButton, BottomNav } from '@/components';
+import type { NavTab } from '@/components/BottomNav';
+import { RootStackParamList } from '@/navigation/types';
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export function HomeScreen() {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
+  const navigation = useNavigation<Nav>();
+  const [activeTab, setActiveTab] = useState<NavTab>('home');
+
+  const handleTabPress = (tab: NavTab) => {
+    setActiveTab(tab);
+    if (tab === 'settings') navigation.navigate('Settings');
+  };
 
   return (
     <ThemeBackground>
-      {/* Header */}
       <View style={styles.header}>
         <AppLogo size={52} />
         <StreakBadge count={3} />
       </View>
 
-      {/* Content area — replace with your feature */}
-      <View style={[styles.content, { paddingBottom: theme.spacing.navHeight + insets.bottom + 16 }]}>
-        <GlassCard style={[styles.card, { padding: theme.spacing.cardPadding, borderRadius: theme.rounded.lg }]}>
-          <Text style={[styles.placeholder, { color: theme.colors.textMuted }]}>
-            Your feature goes here.
-          </Text>
-        </GlassCard>
-
-        {/* Primary CTA */}
-        <GlassButton label="Start" onPress={() => {}} style={styles.cta} />
+      <View style={[styles.content, { paddingBottom: theme.spacing.navHeight + 32 }]}>
+        <Text style={[styles.welcome, { color: theme.colors.textOnSurface }]}>
+          Welcome to Your Wellness App
+        </Text>
+        <GlassButton label="Start Brain Dump" onPress={() => {}} />
       </View>
+
+      <BottomNav activeTab={activeTab} onTabPress={handleTabPress} />
     </ThemeBackground>
   );
 }
@@ -44,18 +48,11 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'center',
-    gap: 16,
-  },
-  card: {
-    minHeight: 200,
-    justifyContent: 'center',
     alignItems: 'center',
   },
-  placeholder: {
-    fontSize: 16,
-    fontStyle: 'italic',
-  },
-  cta: {
-    marginTop: 8,
+  welcome: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
 });

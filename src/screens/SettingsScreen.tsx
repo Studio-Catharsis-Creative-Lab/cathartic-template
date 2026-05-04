@@ -1,10 +1,14 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeBackground, GlassCard, AppLogo, StreakBadge, BottomNav } from '@/components';
+import type { NavTab } from '@/components/BottomNav';
+import { RootStackParamList } from '@/navigation/types';
 import { themes, ThemeName } from '@/themes';
 
 const THEME_ICONS: Record<ThemeName, keyof typeof Ionicons.glyphMap> = {
@@ -15,10 +19,19 @@ const THEME_ICONS: Record<ThemeName, keyof typeof Ionicons.glyphMap> = {
   underwater: 'water-outline',
 };
 
+type Nav = NativeStackNavigationProp<RootStackParamList>;
+
 export function SettingsScreen() {
   const { theme, themeName, setTheme, availableThemes } = useTheme();
   const { user, signOut } = useAuth();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<Nav>();
+  const [activeTab, setActiveTab] = useState<NavTab>('settings');
+
+  const handleTabPress = (tab: NavTab) => {
+    setActiveTab(tab);
+    if (tab === 'home') navigation.navigate('Main');
+  };
 
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -111,6 +124,8 @@ export function SettingsScreen() {
           <Text style={[styles.signOutLabel, { color: theme.colors.error }]}>Sign Out</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <BottomNav activeTab={activeTab} onTabPress={handleTabPress} />
     </ThemeBackground>
   );
 }

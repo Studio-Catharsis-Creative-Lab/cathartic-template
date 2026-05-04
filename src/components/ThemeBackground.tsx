@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ImageBackground, ViewProps } from 'react-native';
+import { StyleSheet, View, ImageBackground, Image, Platform, ViewProps } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -29,10 +29,24 @@ export function ThemeBackground({ children, style, ...props }: ThemeBackgroundPr
     </View>
   );
 
-  // Falls back to gradient-only until a real background image is added to assets/
   if (!theme.assets.backgroundImage) {
     return (
       <View style={[styles.root, style]}>
+        {gradient}
+        {content}
+      </View>
+    );
+  }
+
+  // Web: blurRadius prop doesn't work — use CSS filter on Image
+  if (Platform.OS === 'web') {
+    return (
+      <View style={[styles.root, style]}>
+        <Image
+          source={theme.assets.backgroundImage}
+          style={styles.webBg as any}
+          resizeMode="cover"
+        />
         {gradient}
         {content}
       </View>
@@ -55,4 +69,10 @@ export function ThemeBackground({ children, style, ...props }: ThemeBackgroundPr
 const styles = StyleSheet.create({
   root: { flex: 1 },
   content: { flex: 1 },
+  webBg: {
+    ...StyleSheet.absoluteFillObject,
+    // @ts-ignore — web-only CSS
+    filter: 'blur(30px)',
+    transform: [{ scale: 1.15 }],
+  },
 });

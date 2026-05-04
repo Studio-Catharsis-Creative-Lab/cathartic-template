@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   spacer: { flex: 1 },
-  form: { gap: 4 },
+  form: { gap: 16 },
   button: { marginTop: 8 },
   forgotWrap: { alignItems: 'center', marginTop: 12 },
   forgot: { fontSize: 14 },
